@@ -57,27 +57,26 @@ def signup(request):
         context = {
             "form": form
             }
-        if form.is_valid():
-            user = form.save()
-            if user is not None:
-                return redirect('login')
-        else:
+        if not form.is_valid():
             return render(request, 'signup.html', context= context)
+        user = form.save()
+        if user is not None:
+            return redirect('login')
 
 def add_todo(request):
-    if request.user.is_authenticated:
-        user = request.user
-        print(user)
-        form = ToDoForm(request.POST)
-        if form.is_valid():
-            print(form.cleaned_data)
-            todo = form.save(commit=False)
-            todo.user = user
-            todo.save()
-            print(todo)
-            return redirect("home")
-        else: 
-            return render(request , 'index.html' , context={'form' : form})
+    if not request.user.is_authenticated:
+        return
+    user = request.user
+    print(user)
+    form = ToDoForm(request.POST)
+    if not form.is_valid():
+        return render(request , 'index.html' , context={'form' : form})
+    print(form.cleaned_data)
+    todo = form.save(commit=False)
+    todo.user = user
+    todo.save()
+    print(todo)
+    return redirect("home")
 
 
 def signout(request):
